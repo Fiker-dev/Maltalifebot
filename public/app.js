@@ -7,6 +7,7 @@ const status = document.querySelector('#status');
 const handoff = document.querySelector('#handoff');
 const whatsappLink = document.querySelector('#whatsapp-link');
 const history = [];
+const coarse = matchMedia('(pointer: coarse)').matches;
 let greetingData;
 function updateWelcome() {
   if (!greetingData || history.length) return;
@@ -35,15 +36,16 @@ function addMessage(text, role) {
 async function send(text) {
   text = text.trim(); if (!text || form.dataset.busy) return;
   input.value = ''; quick.hidden = true; form.dataset.busy = 'true'; form.querySelector('button').disabled = true;
-  addMessage(text,'user'); const loading = addMessage('Thulani is thinking…','bot');
+  addMessage(text,'user'); const loading = addMessage('','bot'); const dots = loading.querySelector('.bubble');
+  dots.classList.add('typing'); dots.setAttribute('aria-label','Thulani is typing'); dots.innerHTML = '<i></i><i></i><i></i>';
   try {
     const response = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,history})});
     if (!response.ok) throw new Error('Connection failed');
-    const data = await response.json(); loading.querySelector('.bubble').textContent = data.text;
+    const data = await response.json(); dots.classList.remove('typing'); dots.removeAttribute('aria-label'); dots.textContent = data.text;
     history.push({role:'user',content:text},{role:'assistant',content:data.text});
     if (/advisor|human|staff|contact|email|whatsapp|call me|speak to/.test(text.toLowerCase())) handoff.hidden = false;
-  } catch { loading.querySelector('.bubble').textContent = 'I’m having trouble connecting right now. Please try again, or call Matla Life on +27 87 210 0782.'; }
-  finally { delete form.dataset.busy; form.querySelector('button').disabled = false; input.focus(); messages.scrollTop = messages.scrollHeight; }
+  } catch { dots.classList.remove('typing'); dots.removeAttribute('aria-label'); dots.textContent = 'I’m having trouble connecting right now. Please try again, or call Matla Life on +27 87 210 0782.'; }
+  finally { delete form.dataset.busy; form.querySelector('button').disabled = false; if (!coarse) input.focus(); messages.scrollTop = messages.scrollHeight; }
 }
 form.addEventListener('submit',event=>{event.preventDefault();send(input.value)});
 quick.addEventListener('click',event=>{const button=event.target.closest('button[data-prompt]');if(button)send(button.dataset.prompt)});
