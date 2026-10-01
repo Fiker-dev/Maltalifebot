@@ -19,11 +19,14 @@ export function fallback(message) {
 
 function naturalReply(text, message) {
   let cleaned = text.trim();
+  const greeting = '(?:hello|hi|hey|good (?:morning|afternoon|evening|day))(?: there)?';
+  const visitorGreeted = /^\s*(?:hello|hi|hey|hiya|howzit|good (?:morning|afternoon|evening|day)|sawubona|molo|dumela|avuxeni|ndaa|lotjhani)\b/i.test(message);
   if (!/who are you|what is your name|your name|are you (a|an) (bot|ai|assistant)/i.test(message)) {
-    cleaned = cleaned.replace(/^(?:hello|hi|hey|good (?:morning|afternoon|evening))[!,. ]*(?:i(?:'|’)m|i am) Thulani,?\s*(?:a |the )?(?:Matla Life(?:'s|’s)? )?(?:virtual |AI )?assistant[.! ]*/i, '');
-    cleaned = cleaned.replace(/^(?:hello|hi|hey|good (?:morning|afternoon|evening))[!,. ]*/i, '');
+    cleaned = cleaned.replace(new RegExp(`^${greeting}[!,. ]*(?:i(?:'|’)m|i am) Thulani,?\\s*(?:a |the )?(?:Matla Life(?:'s|’s)? )?(?:virtual |AI )?assistant[.! ]*`, 'i'), '');
+    if (!visitorGreeted) cleaned = cleaned.replace(new RegExp(`^${greeting}\\b[!,.]*\\s*`, 'i'), '');
   }
-  return cleaned.replace(/^thanks for (?:asking|your question)[!,. ]*/i, '').trim() || text.trim();
+  cleaned = cleaned.replace(/^thanks for (?:asking|your question)[!,. ]*/i, '').trim();
+  return cleaned ? cleaned[0].toUpperCase() + cleaned.slice(1) : text.trim();
 }
 
 export async function reply(message, history) {
