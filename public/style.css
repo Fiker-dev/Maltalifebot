@@ -124,3 +124,6 @@ button,input{font:inherit}
 @media(max-width:760px) and (prefers-reduced-motion:reduce){.chat{animation:none}}
 @keyframes tray-up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
 @media(max-width:380px){.chat-head span:not(.status){display:none}.intro p{display:none}}
+.bubble a{color:inherit;font-weight:650;text-decoration:underline;text-decoration-color:var(--orange);text-decoration-thickness:2px;text-underline-offset:3px}
+.user .bubble a{text-decoration-color:rgba(255,255,255,.6)}
+@media(prefers-reduced-motion:no-preference){.quick:not([hidden]) button{animation:appear .35s var(--ease) both}.quick button:nth-child(2){animation-delay:.05s}.quick button:nth-child(3){animation-delay:.1s}}
