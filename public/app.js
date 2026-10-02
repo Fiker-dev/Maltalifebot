@@ -4,8 +4,14 @@ const messages = document.querySelector('#messages');
 const quick = document.querySelector('#quick');
 const welcomeIntro = document.querySelector('#welcome-intro');
 const status = document.querySelector('#status');
-const handoff = document.querySelector('#handoff');
-const whatsappLink = document.querySelector('#whatsapp-link');
+const leadDialog = document.querySelector('#handoff-dialog');
+const leadForm = document.querySelector('#lead-form');
+const leadTopic = document.querySelector('#lead-topic');
+const leadNote = document.querySelector('#lead-note');
+const leadPhone = document.querySelector('#lead-phone');
+const leadEmail = document.querySelector('#lead-email');
+const leadConsent = document.querySelector('#lead-consent');
+const leadError = document.querySelector('#lead-error');
 const history = [];
 const coarse = matchMedia('(pointer: coarse)').matches;
 let greetingData;
@@ -20,9 +26,6 @@ async function updateTime() {
     status.textContent = greetingData.open ? 'Office open' : 'Office closed';
     status.classList.toggle('closed', !greetingData.open);
     status.title = `South African time ${greetingData.time} · Mon–Fri 08:00–17:30`;
-    handoff.hidden = greetingData.open && !history.some(x=>x.role==='user' && /advisor|human|staff|contact|email|whatsapp|call me|speak to/.test(x.content.toLowerCase()));
-    whatsappLink.hidden = !greetingData.whatsapp;
-    if (greetingData.whatsapp) whatsappLink.href = `https://wa.me/${greetingData.whatsapp}?text=${encodeURIComponent('Hello Matla Life, I would like help from an advisor.')}`;
     updateWelcome();
   } catch { status.textContent = 'Office hours: Mon–Fri'; }
 }
@@ -71,9 +74,73 @@ async function send(text) {
     const data = await response.json(); dots.classList.remove('typing'); dots.removeAttribute('aria-label'); setRichText(dots, data.text);
     history.push({role:'user',content:text},{role:'assistant',content:data.text});
     suggest(text, data.text);
-    if (/advisor|human|staff|contact|email|whatsapp|call me|speak to/.test(text.toLowerCase())) handoff.hidden = false;
   } catch { dots.classList.remove('typing'); dots.removeAttribute('aria-label'); setRichText(dots, 'I’m having trouble connecting right now. Please try again, or call Matla Life on +27 87 210 0782.'); suggest(''); }
   finally { delete form.dataset.busy; form.querySelector('button').disabled = false; if (!coarse) input.focus(); messages.scrollTop = messages.scrollHeight; }
 }
 form.addEventListener('submit',event=>{event.preventDefault();send(input.value)});
 quick.addEventListener('click',event=>{const button=event.target.closest('button[data-prompt]');if(button)send(button.dataset.prompt)});
+
+const topicRules = [
+  [/funeral|burial|consolidated|family cover/, 'Funeral cover'],
+  [/life cover|life insurance/, 'Life cover'],
+  [/will|estate/, 'Wills and estate planning'],
+  [/insure|vehicle|car|home insurance/, 'Matla Insure'],
+];
+function scoreLead(selectedTopic) {
+  const userText = history.filter(item => item.role === 'user').map(item => item.content.toLowerCase()).join(' ');
+  const topic = selectedTopic || topicRules.find(([rule]) => rule.test(userText))?.[1] || 'General enquiry';
+  const reasons = [];
+  let score = 20;
+  if (topic !== 'General enquiry') { score += 20; reasons.push('Product interest'); }
+  if (/quote|price|cost|premium|apply|sign up|join/.test(userText)) { score += 30; reasons.push('Ready to explore options'); }
+  if (/advisor|human|staff|contact|email|whatsapp|call me|speak to/.test(userText)) { score += 20; reasons.push('Asked for an advisor'); }
+  if (/urgent|soon|today|asap/.test(userText)) { score += 10; reasons.push('Time sensitive'); }
+  return { topic, score: Math.min(score, 100), reasons };
+}
+function updateLeadPreview() {
+  const result = scoreLead(leadTopic.value);
+  const topic = leadTopic.value;
+  const priority = result.score >= 70 ? 'High' : result.score >= 40 ? 'Medium' : 'Exploring';
+  document.querySelector('#lead-priority').textContent = `${priority} · ${result.score}/100`;
+  document.querySelector('#lead-brief').textContent = `${topic} enquiry${leadNote.value.trim() ? ` — ${leadNote.value.trim()}` : ''}`;
+  document.querySelector('#lead-reasons').textContent = `Demo lead score based on stated interest: ${result.reasons.join(', ') || 'Initial enquiry'}. This is not an insurance eligibility assessment.`;
+}
+document.querySelector('#handoff-open').addEventListener('click', () => {
+  leadTopic.value = scoreLead().topic;
+  leadError.hidden = true;
+  updateLeadPreview();
+  leadDialog.showModal();
+});
+document.querySelector('#handoff-close').addEventListener('click', () => leadDialog.close());
+leadDialog.addEventListener('click', event => { if (event.target === leadDialog) leadDialog.close(); });
+leadTopic.addEventListener('change', updateLeadPreview);
+leadNote.addEventListener('input', updateLeadPreview);
+leadForm.addEventListener('submit', event => event.preventDefault());
+
+function handoffDraft(channel) {
+  const phone = leadPhone.value.trim();
+  const email = leadEmail.value.trim();
+  const error = message => { leadError.textContent = message; leadError.hidden = false; };
+  leadError.hidden = true;
+  if (!phone && !email) return error('Please add a phone number or email address so an advisor can reach you.');
+  if (email && !leadEmail.checkValidity()) return error('Please enter a valid email address.');
+  if (phone && !/^[+\d\s()-]{7,20}$/.test(phone)) return error('Please enter a valid phone number.');
+  if (!leadConsent.checked) return error('Please agree before sharing your details with Matla Life.');
+  const result = scoreLead(leadTopic.value);
+  const brief = [
+    'Hello Matla Life, I would like an advisor to contact me.',
+    `Topic: ${leadTopic.value}`,
+    leadNote.value.trim() ? `Additional context: ${leadNote.value.trim()}` : null,
+    `Demo lead priority: ${result.score >= 70 ? 'High' : result.score >= 40 ? 'Medium' : 'Exploring'} (${result.score}/100)`,
+    `Contact me by: ${[phone && `phone ${phone}`, email && `email ${email}`].filter(Boolean).join(' or ')}`,
+    'I consent to Matla Life contacting me about this enquiry.'
+  ].filter(Boolean).join('\n');
+  if (channel === 'whatsapp') {
+    if (!greetingData?.whatsapp) return error('WhatsApp is unavailable right now. Please use email.');
+    window.open(`https://wa.me/${greetingData.whatsapp}?text=${encodeURIComponent(brief)}`, '_blank', 'noopener,noreferrer');
+  } else {
+    location.href = `mailto:info@matlalife.co.za?subject=${encodeURIComponent(`Advisor enquiry: ${leadTopic.value}`)}&body=${encodeURIComponent(brief)}`;
+  }
+}
+document.querySelector('#lead-whatsapp').addEventListener('click', () => handoffDraft('whatsapp'));
+document.querySelector('#lead-email-send').addEventListener('click', () => handoffDraft('email'));

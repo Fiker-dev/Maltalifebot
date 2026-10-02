@@ -11,7 +11,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;min-height:100dvh;background:radial-gradient(1200px 600px at 10% -10%,#fbe3d9 0,transparent 60%),#eceff2}
-button,input{font:inherit}
+button,input,select,textarea{font:inherit}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* ---------- Shell ---------- */
@@ -72,8 +72,9 @@ button,input{font:inherit}
 .quick button:hover,.quick button:focus-visible{border-color:var(--orange);background:var(--orange-soft)}
 .quick button:active{transform:scale(.97)}
 .handoff{display:flex;gap:8px;flex-wrap:wrap;padding:2px 30px 12px}
-.handoff a{display:inline-flex;align-items:center;color:var(--navy);background:var(--orange-soft);border:1px solid var(--orange-line);border-radius:12px;padding:10px 14px;font-size:13px;font-weight:650;text-decoration:none;transition:background .2s,border-color .2s}
-.handoff a:hover,.handoff a:focus-visible{background:#ffe3d8;border-color:var(--orange)}
+.handoff button{display:inline-flex;align-items:center;gap:10px;color:var(--navy);background:var(--orange-soft);border:1px solid var(--orange-line);border-radius:12px;padding:10px 14px;font-size:13px;font-weight:650;cursor:pointer;transition:background .2s,border-color .2s}
+.handoff button span{color:var(--orange)}
+.handoff button:hover,.handoff button:focus-visible{background:#ffe3d8;border-color:var(--orange)}
 .composer{margin:0 30px;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #dde2e8;border-radius:999px;padding:6px 6px 6px 8px;box-shadow:0 8px 24px rgba(29,41,57,.08);transition:border-color .2s,box-shadow .2s}
 .composer:focus-within{border-color:var(--orange);box-shadow:0 0 0 4px rgba(242,87,44,.14),0 8px 24px rgba(29,41,57,.08)}
 .composer input{flex:1;min-width:0;border:0;outline:0;padding:11px 12px;font-size:15px;background:transparent;color:var(--ink)}
@@ -116,7 +117,7 @@ button,input{font:inherit}
   .quick{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:2px 16px 10px;scroll-padding:0 16px;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
   .quick::-webkit-scrollbar{display:none}
   .handoff{padding:2px 16px 10px}
-  .handoff a{flex:1;justify-content:center}
+  .handoff button{flex:1;justify-content:center}
   .composer{margin:0 12px}
   .composer input{font-size:16px} /* prevents iOS zoom on focus */
   .fineprint{margin:8px 18px calc(10px + env(safe-area-inset-bottom,0px));font-size:10px}
@@ -127,3 +128,32 @@ button,input{font:inherit}
 .bubble a{color:inherit;font-weight:650;text-decoration:underline;text-decoration-color:var(--orange);text-decoration-thickness:2px;text-underline-offset:3px}
 .user .bubble a{text-decoration-color:rgba(255,255,255,.6)}
 @media(prefers-reduced-motion:no-preference){.quick:not([hidden]) button{animation:appear .35s var(--ease) both}.quick button:nth-child(2){animation-delay:.05s}.quick button:nth-child(3){animation-delay:.1s}}
+
+/* Advisor handoff */
+.lead-dialog{width:min(540px,calc(100% - 24px));max-height:min(90dvh,850px);border:0;border-radius:22px;padding:0;color:var(--ink);box-shadow:0 30px 90px rgba(20,30,44,.28);overflow:auto}
+.lead-dialog::backdrop{background:rgba(20,30,44,.55);backdrop-filter:blur(3px)}
+.lead-dialog form{position:relative;padding:30px}
+.dialog-close{position:absolute;right:22px;top:18px;width:32px;height:32px;border:0;border-radius:50%;background:#f2f4f7;color:var(--navy);font-size:25px;line-height:1;cursor:pointer}
+.lead-eyebrow{font-size:10px;font-weight:750;letter-spacing:.18em;color:var(--orange-deep);margin-bottom:9px}
+.lead-dialog h2{font:400 32px/1.1 Georgia,serif;letter-spacing:-.035em;margin:0 34px 9px 0}
+.lead-intro{font-size:13px;line-height:1.5;color:#697585;margin:0 0 18px}
+.lead-preview{background:var(--orange-soft);border:1px solid var(--orange-line);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.lead-preview div{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.lead-preview strong{font-size:13px}.lead-preview span{font-size:11px;font-weight:750;color:var(--orange-deep);white-space:nowrap}
+.lead-preview p{margin:8px 0 5px;font-size:14px;line-height:1.4}.lead-preview small{color:#8d614f;font-size:11px;line-height:1.4}
+.lead-dialog label:not(.lead-consent){display:block;font-size:12px;font-weight:700;margin:12px 0 6px}
+.lead-dialog label span{font-weight:400;color:var(--muted)}
+.lead-dialog select,.lead-dialog textarea,.lead-dialog input:not([type=checkbox]){width:100%;border:1px solid #d7dde4;border-radius:10px;background:#fff;color:var(--ink);padding:10px 12px;outline:none;font-size:14px}
+.lead-dialog select:focus,.lead-dialog textarea:focus,.lead-dialog input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(242,87,44,.12)}
+.lead-dialog textarea{resize:vertical;min-height:62px}
+.lead-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lead-hint{font-size:11px;line-height:1.45;color:#7a8592;margin:8px 0 0}
+.lead-consent{display:flex;align-items:flex-start;gap:10px;margin:17px 0 14px;font-size:12px;line-height:1.45;cursor:pointer}
+.lead-consent input{flex:none;width:17px;height:17px;margin:1px 0 0;accent-color:var(--orange)}
+.lead-consent span{color:var(--ink)!important}
+.lead-error{font-size:12px;color:#b22424;margin:0 0 10px}
+.lead-actions{display:flex;gap:9px}
+.lead-actions button{flex:1;border:0;border-radius:10px;padding:12px 8px;background:var(--navy);color:#fff;font-size:12px;font-weight:700;cursor:pointer}
+.lead-actions button:first-child{background:var(--orange)}
+.lead-actions button:hover{filter:brightness(.93)}
+@media(max-width:520px){.lead-dialog form{padding:24px 18px}.lead-dialog h2{font-size:28px}.lead-fields{grid-template-columns:1fr;gap:0}.lead-actions{flex-direction:column}}
