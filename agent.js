@@ -25,13 +25,13 @@ function naturalReply(text, message) {
     cleaned = cleaned.replace(new RegExp(`^${greeting}[!,. ]*(?:i(?:'|’)m|i am) Thulani,?\\s*(?:a |the )?(?:Matla Life(?:'s|’s)? )?(?:virtual |AI )?assistant[.! ]*`, 'i'), '');
     if (!visitorGreeted) cleaned = cleaned.replace(new RegExp(`^${greeting}\\b[!,.]*\\s*`, 'i'), '');
   }
-  cleaned = cleaned.replace(/^thanks for (?:asking|your question)[!,. ]*/i, '').trim();
+  cleaned = cleaned.replace(/^(?:thanks for (?:asking|your question)|great question|i(?:'|’)d be happy to help)[!,. ]*/i, '').trim();
   if (!cleaned) return text.trim();
   return limitLength(cleaned[0].toUpperCase() + cleaned.slice(1));
 }
 
-// Backstop for over-long replies: keep whole sentences up to ~80 words, adding the closing question only if it still fits.
-function limitLength(text, maxWords = 80) {
+// Backstop for over-long replies: keep whole sentences and an optional closing question only when they fit.
+function limitLength(text, maxWords = 65) {
   const words = value => value.split(/\s+/).filter(Boolean).length;
   if (words(text) <= maxWords) return text;
   const sentences = text.match(/[^.!?]+[.!?]+["’”)]*\s*|[^.!?]+$/g) || [text];
@@ -47,6 +47,9 @@ function limitLength(text, maxWords = 80) {
 }
 
 export async function reply(message, history) {
+  if (/\b(price|prices|cost|premium|premiums|quote|quotes|afford)\b|per month|monthly payment/i.test(message)) {
+    return { text: 'I can’t confirm a current premium here. A Matla Life advisor can check the cover options and policy terms for your situation. You can call +27 87 210 0782 or email info@matlalife.co.za.', mode: 'guided' };
+  }
   const input = [...history.slice(-8).filter(x => ['user','assistant'].includes(x.role) && typeof x.content === 'string').map(x => ({ role:x.role, content:x.content.slice(0,1500) })), { role:'user', content:message }];
   const t = localTime();
   const context = `Current South African local time: ${String(t.hour).padStart(2,'0')}:${String(t.minute).padStart(2,'0')} on ${t.weekday}. Listed office is ${t.open?'open':'closed'} now (Monday–Friday 08:00–17:30). Use time-sensitive wording only when relevant.`;

@@ -83,7 +83,8 @@ async function send(text) {
     if (!response.ok) throw new Error('Connection failed');
     const data = await response.json(); dots.classList.remove('typing'); dots.removeAttribute('aria-label'); setRichText(dots, data.text);
     history.push({role:'user',content:text},{role:'assistant',content:data.text});
-    suggest(text, data.text);
+    if (/\b(price|prices|cost|premium|premiums|quote|quotes|afford)\b|per month|monthly payment/i.test(text)) quick.hidden = true;
+    else suggest(text, data.text);
   } catch { dots.classList.remove('typing'); dots.removeAttribute('aria-label'); setRichText(dots, 'I’m having trouble connecting right now. Please try again, or call Matla Life on +27 87 210 0782.'); suggest(''); }
   finally { delete form.dataset.busy; form.querySelector('button').disabled = false; if (!coarse) input.focus(); messages.scrollTop = messages.scrollHeight; }
 }
@@ -135,10 +136,10 @@ function handoffDraft(channel) {
   const email = leadEmail.value.trim();
   const error = message => { leadError.textContent = message; leadError.hidden = false; };
   leadError.hidden = true;
-  if (!phone && !email) return error('Please add a phone number or email address so an advisor can reach you.');
+  if (!phone && !email) return error('Please add a phone number or email address for the demo follow-up.');
   if (email && !leadEmail.checkValidity()) return error('Please enter a valid email address.');
   if (phone && !/^[+\d\s()-]{7,20}$/.test(phone)) return error('Please enter a valid phone number.');
-  if (!leadConsent.checked) return error('Please agree before sharing your details with Matla Life.');
+  if (!leadConsent.checked) return error('Please agree before sharing your details with LuliDigital.');
   const result = scoreLead(leadTopic.value);
   const brief = [
     'Hello LuliDigital, I am trying the Thulani demo and would like a follow-up about this enquiry.',
