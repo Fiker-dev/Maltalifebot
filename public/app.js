@@ -17,7 +17,7 @@ const coarse = matchMedia('(pointer: coarse)').matches;
 let greetingData;
 function updateWelcome() {
   if (!greetingData || history.length) return;
-  welcomeIntro.textContent = `Good ${greetingData.period}! I’m Thulani, Matla Life’s virtual assistant. ${greetingData.open ? 'Our team is available now. Ask me anything, and I can help you reach them if needed.' : `Our staff are out of office right now, but I’m here to talk. Ask me any question. If you need their help later, I can guide you to ${greetingData.whatsapp ? 'WhatsApp or email' : 'email'}.`}`;
+  welcomeIntro.textContent = `Good ${greetingData.period}! I’m Thulani, Matla Life’s virtual assistant. ${greetingData.open ? 'Our team is within office hours now. What would you like to know?' : 'Our staff are out of office right now, but I’m here to talk. Ask me any question, and I can show you how an advisor handoff works.'}`;
 }
 async function updateTime() {
   try {
@@ -141,18 +141,18 @@ function handoffDraft(channel) {
   if (!leadConsent.checked) return error('Please agree before sharing your details with Matla Life.');
   const result = scoreLead(leadTopic.value);
   const brief = [
-    'Hello Matla Life, I would like an advisor to contact me.',
+    'Hello LuliDigital, I am trying the Thulani demo and would like a follow-up about this enquiry.',
     `Topic: ${leadTopic.value}`,
     leadNote.value.trim() ? `Additional context: ${leadNote.value.trim()}` : null,
     `Demo lead priority: ${result.score >= 70 ? 'High' : result.score >= 40 ? 'Medium' : 'Exploring'} (${result.score}/100)`,
     `Contact me by: ${[phone && `phone ${phone}`, email && `email ${email}`].filter(Boolean).join(' or ')}`,
-    'I consent to Matla Life contacting me about this enquiry.'
+    'I consent to LuliDigital contacting me about this demo enquiry.'
   ].filter(Boolean).join('\n');
   if (channel === 'whatsapp') {
     if (!greetingData?.whatsapp) return error('WhatsApp is unavailable right now. Please use email.');
     window.open(`https://wa.me/${greetingData.whatsapp}?text=${encodeURIComponent(brief)}`, '_blank', 'noopener,noreferrer');
   } else {
-    location.href = `mailto:info@matlalife.co.za?subject=${encodeURIComponent(`Advisor enquiry: ${leadTopic.value}`)}&body=${encodeURIComponent(brief)}`;
+    location.href = `mailto:${greetingData?.email || 'info@lulidigital.com'}?subject=${encodeURIComponent(`Thulani demo enquiry: ${leadTopic.value}`)}&body=${encodeURIComponent(brief)}`;
   }
 }
 document.querySelector('#lead-whatsapp').addEventListener('click', () => handoffDraft('whatsapp'));

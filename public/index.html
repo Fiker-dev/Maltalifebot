@@ -35,7 +35,7 @@
     </div>
 
     <div class="dock">
-      <div class="handoff" id="handoff"><button id="handoff-open" type="button">Ask an advisor to contact me <span>↗</span></button></div>
+      <div class="handoff" id="handoff"><button id="handoff-open" type="button">Preview an advisor handoff <span>↗</span></button></div>
       <div class="quick" id="quick">
         <button type="button" data-prompt="Tell me about funeral cover">Funeral cover <span>↗</span></button>
         <button type="button" data-prompt="What products does Matla Life offer?">Explore products <span>↗</span></button>
@@ -53,9 +53,9 @@
 <dialog id="handoff-dialog" class="lead-dialog" aria-labelledby="lead-title">
   <form id="lead-form" method="dialog">
     <button class="dialog-close" type="button" id="handoff-close" aria-label="Close">×</button>
-    <div class="lead-eyebrow">MATLA LIFE · ADVISOR HANDOFF</div>
-    <h2 id="lead-title">Let’s get you the right help</h2>
-    <p class="lead-intro">Tell us what you need, then choose whether to share a message with the team.</p>
+    <div class="lead-eyebrow">THULANI · DEMO HANDOFF</div>
+    <h2 id="lead-title">See how a follow-up works</h2>
+    <p class="lead-intro">Preview the brief an advisor could receive. During this demo, messages go to LuliDigital, who built Thulani. Matla Life’s own contacts can be connected later.</p>
     <div class="lead-preview"><div><strong>Advisor preview</strong><span id="lead-priority"></span></div><p id="lead-brief"></p><p class="lead-preview-contact" id="lead-preview-contact">Contact details appear here when you add them.</p><small id="lead-reasons"></small></div>
     <label for="lead-topic">What would you like help with?</label>
     <select id="lead-topic" name="topic"><option>Funeral cover</option><option>Life cover</option><option>Wills and estate planning</option><option>Matla Insure</option><option>General enquiry</option></select>
@@ -63,10 +63,10 @@
     <textarea id="lead-note" name="note" rows="2" maxlength="350" placeholder="A little context helps us prepare."></textarea>
     <div class="lead-fields"><div><label for="lead-phone">Your phone number</label><input id="lead-phone" name="phone" type="tel" autocomplete="tel" placeholder="e.g. 082 123 4567"></div><div><label for="lead-email">Your email address</label><input id="lead-email" name="email" type="email" autocomplete="email" placeholder="you@example.com"></div></div>
     <p class="lead-hint">Enter a phone number, an email address, or both.</p>
-    <label class="lead-consent"><input id="lead-consent" type="checkbox"><span>I agree to share these details and my brief with Matla Life so an advisor can contact me about this enquiry.</span></label>
+    <label class="lead-consent"><input id="lead-consent" type="checkbox"><span>I agree to share these details and my brief with LuliDigital for this demo follow-up.</span></label>
     <p class="lead-error" id="lead-error" role="alert" hidden></p>
     <div class="lead-actions"><button type="button" id="lead-whatsapp">Continue to WhatsApp ↗</button><button type="button" id="lead-email-send">Continue to email ↗</button></div>
-    <p class="lead-hint">Your chosen app opens a draft for you to review and send. This demo does not save your details. WhatsApp availability on the published office number is being checked.</p>
+    <p class="lead-hint">Your chosen app opens a draft for you to review and send. This demo does not save your details. These demo contacts will be replaced with Matla Life’s chosen contacts before launch.</p>
   </form>
 </dialog>
 <script src="/app.js"></script>

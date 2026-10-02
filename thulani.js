@@ -14,5 +14,5 @@ export function greeting(language = 'en', now = new Date()) {
 }
 export function opening(now = new Date()) {
   const t = localTime(now);
-  return `${greeting('en',now)}! I’m Thulani, Matla Life’s virtual assistant. ${t.open ? 'Our team is available now.' : 'Our staff are out of office right now, but I’m here to talk. Ask me any question. If you need their help later, I can guide you to email.'} What can I help you with today?`;
+  return `${greeting('en',now)}! I’m Thulani, Matla Life’s virtual assistant. ${t.open ? 'The team is within office hours now.' : 'Our staff are out of office right now, but I’m here to talk.'} What can I help you with today?`;
 }
