@@ -113,7 +113,7 @@ function updateLeadPreview() {
   const topic = leadTopic.value;
   const priority = result.score >= 70 ? 'High' : result.score >= 40 ? 'Medium' : 'Exploring';
   document.querySelector('#lead-priority').textContent = `${priority} · ${result.score}/100`;
-  document.querySelector('#lead-brief').textContent = `${topic} enquiry${leadNote.value.trim() ? ` — ${leadNote.value.trim()}` : ''}`;
+  document.querySelector('#lead-brief').textContent = `${topic === 'General enquiry' ? topic : `${topic} enquiry`}${leadNote.value.trim() ? ` — ${leadNote.value.trim()}` : ''}`;
   document.querySelector('#lead-preview-contact').textContent = [leadPhone.value.trim() && `Phone: ${leadPhone.value.trim()}`, leadEmail.value.trim() && `Email: ${leadEmail.value.trim()}`].filter(Boolean).join(' · ') || 'Contact details appear here when you add them.';
   document.querySelector('#lead-reasons').textContent = `Demo lead score based on stated interest: ${result.reasons.join(', ') || 'Initial enquiry'}. This is not an insurance eligibility assessment.`;
 }
