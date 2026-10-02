@@ -44,18 +44,28 @@ function setRichText(el, text) {
   el.append(text.slice(last));
 }
 const followUps = [
-  [/funeral|family|burial|22/, ['How does the consolidated plan work?','Who can I add to my plan?','Speak to an advisor']],
-  [/life cover|life insurance/, ['What does life cover protect?','Do you offer funeral cover too?','Speak to an advisor']],
-  [/will|estate/, ['Why should I have a will?','What other products do you offer?','Speak to an advisor']],
-  [/insure|vehicle|car|home/, ['What does Matla Insure cover?','What other products do you offer?','Speak to an advisor']],
-  [/advisor|contact|call|email|office/, ['What are your office hours?','Tell me about funeral cover','What products do you offer?']],
+  [/funeral|family|burial|22/, ['How does the consolidated plan work?', 'Who can I include?']],
+  [/life cover|life insurance/, ['What does life cover protect?', 'Is funeral cover different?']],
+  [/will|estate/, ['Why is a will important?', 'What other products do you offer?']],
+  [/insure|vehicle|car|home/, ['What does Matla Insure cover?', 'Can an advisor help me choose?']],
+  [/advisor|contact|call|email|office/, ['What are your office hours?', 'How do I prepare for an advisor?']],
 ];
 function suggest(question, answer = '') {
   const match = text => followUps.find(([pattern]) => pattern.test(text.toLowerCase()));
   const found = match(question) || match(answer);
-  const options = found ? found[1] : ['Tell me about funeral cover','What products do you offer?','Speak to an advisor'];
-  quick.replaceChildren(...options.map(label => { const b = document.createElement('button'); b.type = 'button'; b.dataset.prompt = label === 'Speak to an advisor' ? 'How can I contact an advisor?' : label; b.innerHTML = '<span>↗</span>'; b.prepend(label + ' '); return b; }));
-  quick.hidden = false; quick.scrollLeft = 0;
+  const asked = new Set(history.filter(item => item.role === 'user').map(item => item.content.toLowerCase().replace(/[^a-z0-9]/g, '')));
+  const options = (found ? found[1] : ['What products do you offer?', 'Tell me about funeral cover'])
+    .filter(label => !asked.has(label.toLowerCase().replace(/[^a-z0-9]/g, '')))
+    .slice(0, 2);
+  quick.replaceChildren(...options.map(label => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.prompt = label;
+    button.textContent = label;
+    return button;
+  }));
+  quick.hidden = options.length === 0;
+  quick.scrollLeft = 0;
 }
 function addMessage(text, role) {
   const item = document.createElement('div'); item.className = `message ${role}`;
@@ -103,6 +113,7 @@ function updateLeadPreview() {
   const priority = result.score >= 70 ? 'High' : result.score >= 40 ? 'Medium' : 'Exploring';
   document.querySelector('#lead-priority').textContent = `${priority} · ${result.score}/100`;
   document.querySelector('#lead-brief').textContent = `${topic} enquiry${leadNote.value.trim() ? ` — ${leadNote.value.trim()}` : ''}`;
+  document.querySelector('#lead-preview-contact').textContent = [leadPhone.value.trim() && `Phone: ${leadPhone.value.trim()}`, leadEmail.value.trim() && `Email: ${leadEmail.value.trim()}`].filter(Boolean).join(' · ') || 'Contact details appear here when you add them.';
   document.querySelector('#lead-reasons').textContent = `Demo lead score based on stated interest: ${result.reasons.join(', ') || 'Initial enquiry'}. This is not an insurance eligibility assessment.`;
 }
 document.querySelector('#handoff-open').addEventListener('click', () => {
@@ -115,6 +126,8 @@ document.querySelector('#handoff-close').addEventListener('click', () => leadDia
 leadDialog.addEventListener('click', event => { if (event.target === leadDialog) leadDialog.close(); });
 leadTopic.addEventListener('change', updateLeadPreview);
 leadNote.addEventListener('input', updateLeadPreview);
+leadPhone.addEventListener('input', updateLeadPreview);
+leadEmail.addEventListener('input', updateLeadPreview);
 leadForm.addEventListener('submit', event => event.preventDefault());
 
 function handoffDraft(channel) {
