@@ -158,3 +158,4 @@ button,input,select,textarea{font:inherit}
 .lead-actions button:first-child{background:var(--orange)}
 .lead-actions button:hover{filter:brightness(.93)}
 @media(max-width:520px){.lead-dialog form{padding:24px 18px}.lead-dialog h2{font-size:28px}.lead-fields{grid-template-columns:1fr;gap:0}.lead-actions{flex-direction:column}}
+.lead-dialog :focus-visible{outline:2px solid var(--orange);outline-offset:2px}
